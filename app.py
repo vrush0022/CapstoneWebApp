@@ -36,7 +36,7 @@ model = model_from_json(loaded_model_json)
 # load weights into model
 model.load_weights("model/model2.h5")
 
-
+'''
 if __name__ == 'app':
     #File handler. Remove default handler    
     
@@ -46,9 +46,9 @@ if __name__ == 'app':
     app.logger.removeHandler(default_handler)        
     app.logger.addHandler(logHandler)
     app.logger.setLevel(logging.INFO)    
-    app.run(debug=False,host='0.0.0.0',port=5000)
+    #app.run(debug=False,host='0.0.0.0',port=5000)
 
-
+'''
 @app.route("/")
 def default():
     return render_template('home.html')
