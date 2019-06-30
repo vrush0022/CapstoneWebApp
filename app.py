@@ -46,7 +46,7 @@ if __name__ == 'app':
     app.logger.removeHandler(default_handler)        
     app.logger.addHandler(logHandler)
     app.logger.setLevel(logging.INFO)    
-    app.run(debug=False,port=33507)
+    app.run(debug=False,host='0.0.0.0',port=5000)
 
 
 @app.route("/")
