@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Image Manipulation Detector</title>
+
 <!-- Required meta tags -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -25,31 +27,45 @@
 
 
 $(document).ajaxStart(function() { Pace.restart(); });
-//$(document).ajaxStop(function() { Pace.stop(); });
+
 $(document).ready(function(){
-$(".custom-file-input").on("change", function() {
-	$('.card').hide()
-	$('#viewresult').hide()
-  var fileName = $(this).val().split("\\").pop();
-  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-});
 
-
-
-	$('#upload_success').hide()
-	$('#viewresult').hide()
-	$('#resimg').hide()
-	$('.card').hide()
+	//init
+	$('#submitimg').hide();
+	$('#resetbutton').hide();
+	$('#upload_success').hide();
+	$('#viewresult').hide();
+	$('#resimg').hide();
+	$('.card').hide();
 	
-	$('#submitimg').click(function(){
-		$('.card').hide()
-		$('#upload_success').hide()
+	
+	$(".custom-file-input").on("change", function() {
+		$('#uid').val('');
+		$('#response').val('');
+		$('.card').hide();
 		$('#viewresult').hide()
-		$('#resimg').hide()
+		$('#resetbutton').hide();
+		var fileName = $(this).val().split("\\").pop();
+		if(fileName==''){
+			$('#submitimg').hide();
+			$(this).siblings(".custom-file-label").addClass("selected").html('Choose File');
+		}else{
+			$('#submitimg').show();
+			$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+		}
+	});
+
+	Pace.track(function () {
+	$('#submitimg').click(function(){
+		$('.card').hide();
+		$('#upload_success').hide();
+		$('#viewresult').hide();
+		$('#resimg').hide();
+		
 		var file = $("#js-upload-files")[0].files[0];
         
 		var form_data = new FormData();
-		form_data.set("file", file)
+		form_data.set("file", file);
         $.ajax({
             type: 'POST',
             url: '/upload',
@@ -66,8 +82,9 @@ $(".custom-file-input").on("change", function() {
 						uid=obj.uid;
 						$('#upload_success').show()	
 						$('#uid').val(uid);
-						$('#viewresult').show()
+						$('#viewresult').show();
 						$('#upload_success').fadeOut(3000);
+						$('#submitimg').hide();
 					}else{
 						alert("Oops!Some error occurred");
 					}
@@ -77,12 +94,14 @@ $(".custom-file-input").on("change", function() {
         });
 	
 	});
+	});
+	
 	Pace.track(function () {
 	$('#viewresult').click(function(){
 		
-		$('#upload_success').hide()
-		$('#resimg').hide()
-		key=$('#uid').val()
+		$('#upload_success').hide();
+		$('#resimg').hide();
+		key=$('#uid').val();
 		
         $.ajax({
             type: 'POST',
@@ -107,7 +126,9 @@ $(".custom-file-input").on("change", function() {
 						$('#resimg').attr("src",src);
 						$('.card-title').text(msg);
 						$('#resimg').show();
-						$('.card').show()
+						$('.card').show();
+						$('#viewresult').hide();
+						$('#resetbutton').show();
 					}else{
 						alert("Oops!Some error occurred");
 					}
@@ -119,12 +140,23 @@ $(".custom-file-input").on("change", function() {
 	});
 	
 	});
+	
+	
+	$('#resetbutton').click(function(){
+		location.reload(true);
+	});
 });
 
 </script>
 <style>
 #viewresult{
-margin-left:30px;
+width:150px;
+}
+#submitimg{
+width:150px;
+}
+#resetbutton{
+width:150px;
 }
 #upload_success{
 margin-top:40px;
@@ -187,13 +219,14 @@ footer p {
             <div class="custom-file">
               <div class="form-group">
                 <input type="file" name="file" id="js-upload-files" class="custom-file-input">
-				<label class="custom-file-label" for="customFile">Choose file</label>
+				<label class="custom-file-label" for="customFile">Choose File</label>
               </div>              
             </div>
 		</p>
 		<p>
             <button type="button" id='submitimg' class="btn btn-sm btn-primary" id="js-upload-submit">Upload Image</button>
 			  <button type="button" class="btn btn-sm btn-success" id='viewresult'> View Result</button>
+			
           </p>
 		  <p>
 		  
@@ -212,6 +245,9 @@ footer p {
 			</div>
 						
 			</p>
+			<p>
+			<button type="button" id='resetbutton' class="btn btn-sm btn-default" >Reset</button>  
+			</p>
 		</div>
 		
       </section>
@@ -220,16 +256,6 @@ footer p {
         
           
 
-          <!-- Drop Zone 
-          <h4>Or drag and drop files below</h4>
-          <div class="upload-drop-zone" id="drop-zone">
-            Just drag and drop files here
-          </div>
-			-->
-		  
-		
-		
-		
 
 </body>
 </head>
