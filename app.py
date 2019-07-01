@@ -41,14 +41,12 @@ def default():
 
 @app.route("/upload",methods=["GET","POST"])
 def upload():
-    try:    
-        file = request.files['file']
-        file_name=file.filename
-        uid=uuid.uuid4().hex+(file_name[file_name.rfind('.'):])
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'],uid))
-        response={'status':'200','uid':uid}
-    except:
-        response={'status':'500','msg':'Error occurred while uploading'}
+    
+    file = request.files['file']
+    file_name=file.filename
+    uid=uuid.uuid4().hex+(file_name[file_name.rfind('.'):])
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'],uid))
+    response={'status':'200','uid':uid}
     return json.dumps(response)
     
 
