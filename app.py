@@ -57,10 +57,9 @@ def showResult():
     try:
         key=request.form['key']
         uploadedimage=Image.open(os.path.join(app.config['UPLOAD_FOLDER'],key))
-        uploadedimage=uploadedimage.resize(size=(256,256))
         verifyExif=checkExifData(uploadedimage)
+        uploadedimage=uploadedimage.resize(size=(256,256))
         if verifyExif==False:
-            uploadedimage=uploadedimage.resize(size=(256,256))
             scaledimage=np.array(uploadedimage)/255.
             pred=predict(scaledimage)
             if(np.count_nonzero(pred.flatten())>100):#atleast 100 pixels should be classified as fake
@@ -115,6 +114,10 @@ def checkExifData(img):
             for tag, value in exifDataRaw.items():
                 decodedTag = ExifTags.TAGS.get(tag, tag)
                 exifData[decodedTag] = value
-            if exifData.get('Software')==None:
+            if exifData.get('Software')==None or checkForForgerySoftware(exifData.get('Software'))==False:
                 toReturn=True
     return toReturn
+
+def checkForForgerySoftware(softwarename):
+    softwares=['PHOTOSHOP','GIMP','PAINT']
+    return any(softwarename.upper().find(sw)!=-1 for sw in softwares)
