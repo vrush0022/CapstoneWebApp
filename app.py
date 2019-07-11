@@ -1,25 +1,18 @@
 from flask import Flask, request,render_template,url_for,session,send_file,Response,send_from_directory
 from flask_restful import  Api
 import json
-import uuid
 import numpy as np
-import os
 from PIL import Image,ImageDraw
-#import cv2 as cv2
 from tensorflow.keras.backend import set_session
 import tensorflow as tf
 from tensorflow.keras.models import model_from_json
 from PIL import ExifTags
+import base64
+from io import BytesIO
 
 app = Flask(__name__)
 api = Api(app)
 
-UPLOAD_FOLDER = 'uploads'
-PREDICTIONS_FOLDER = 'predictions'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['PREDICTIONS_FOLDER'] = PREDICTIONS_FOLDER
    
 #Loading the model    
 graph = tf.get_default_graph()
@@ -38,25 +31,11 @@ model.load_weights("model/model3.h5")
 def default():
     return render_template('home.html')
 
-
-@app.route("/upload",methods=["GET","POST"])
+@app.route("/upload",methods=["POST"])
 def upload():
-    try:    
-        file = request.files['file']
-        file_name=file.filename
-        uid=uuid.uuid4().hex+(file_name[file_name.rfind('.'):])
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'],uid))
-        response={'status':'200','uid':uid}
-    except:
-        response={'status':'500','msg':'Error occurred while uploading'}
-    return json.dumps(response)
-    
-
-@app.route("/result",methods=["GET","POST"])
-def showResult():
     try:
-        key=request.form['key']
-        uploadedimage=Image.open(os.path.join(app.config['UPLOAD_FOLDER'],key))
+        file = request.files['file'].read()
+        uploadedimage=Image.open(BytesIO(file))
         verifyExif=checkExifData(uploadedimage)
         uploadedimage=uploadedimage.resize(size=(256,256))
         if verifyExif==False:
@@ -77,21 +56,14 @@ def showResult():
                 msg='Image Classified as Pristine'
         else:
             msg='Image Classified as Pristine'
-            
-        prefix=key[0:key.rfind('.')]
-        suffix=key[key.rfind('.'):]
-        result_name=prefix+'.predict'+suffix
-        uploadedimage.save(os.path.join(app.config['PREDICTIONS_FOLDER'],result_name),quality=100)
-       
-        response={'status':'200','uid':key,'result':result_name,'msg':msg}
+        byte_io = BytesIO()
+        uploadedimage.save(byte_io,'JPEG',quality=100)
+        byte_io.seek(0)
+        response={'status':'200','msg':msg,'prediction':base64.b64encode(byte_io.getvalue()).decode()}
     except:
-        response={'status':'500','msg':'Error occurred while prediction'}
+        response={'status':'500','msg':'Some error occurred'}
     return json.dumps(response)
-
-
-@app.route('/predictions/<path:filename>')  
-def send_file(filename):  
-    return send_from_directory(app.config['PREDICTIONS_FOLDER'], filename)
+    
 
 
 def predict(img):

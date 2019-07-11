@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Image Manipulation Detector</title>
+<title>Image Forgery Detector</title>
 
 <!-- Required meta tags -->
 <meta charset="utf-8">
@@ -21,7 +21,7 @@
 <script src="{{url_for('static', filename='popper.js')}}"></script>
 <script src="{{url_for('static', filename='bootstrap.js')}}"></script>
 <script src="{{url_for('static', filename='select2.js')}}"></script>
-<script src="{{url_for('static', filename='pace.js')}}"></script>
+<script data-pace-options='{"startOnPageLoad": false }' src="{{url_for('static', filename='pace.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static', filename='pace2.css')}}">
 <script>
 
@@ -31,20 +31,18 @@ $(document).ajaxStart(function() { Pace.restart(); });
 $(document).ready(function(){
 
 	//init
-	$('#submitimg').hide();
-	$('#resetbutton').hide();
-	$('#upload_success').hide();
-	$('#viewresult').hide();
+	//$('#submitimg').hide();
+	//$('#resetbutton').hide();
 	$('#resimg').hide();
 	$('.card').hide();
-	
-	
+
 	$(".custom-file-input").on("change", function() {
-		$('#uid').val('');
-		$('#response').val('');
-		$('.card').hide();
-		$('#viewresult').hide()
 		$('#resetbutton').hide();
+		$('#submitimg').hide();
+		$('#resetbutton').hide();
+		$('#resimg').hide();
+		$('.card').hide();
+		
 		var fileName = $(this).val().split("\\").pop();
 		if (fileName.toUpperCase().endsWith('JPG') || fileName.toUpperCase().endsWith('JPEG') || fileName.toUpperCase().endsWith('PNG')){
 			if(fileName==''){
@@ -56,18 +54,15 @@ $(document).ready(function(){
 			}
 		}else{
 			alert("Only JPEG and PNG Format Allowed");
+			$('#submitimg').hide();
+			$(this).siblings(".custom-file-label").addClass("selected").html('Choose File');
 		}
 	});
 
 	Pace.track(function () {
 	$('#submitimg').click(function(){
-		$('.card').hide();
-		$('#upload_success').hide();
-		$('#viewresult').hide();
-		$('#resimg').hide();
-		
-		var file = $("#js-upload-files")[0].files[0];
-        
+		$(this).hide()
+		var file = $("#js-upload-files")[0].files[0];        
 		var form_data = new FormData();
 		form_data.set("file", file);
         $.ajax({
@@ -78,72 +73,23 @@ $(document).ready(function(){
             cache: false,
             processData: false,
             success: function(jsondata) {
-                if( jsondata != null){
-					obj=JSON.parse(jsondata)
-					status=obj.status;
-					
-					if(status=='200'){
-						uid=obj.uid;
-						$('#upload_success').show()	
-						$('#uid').val(uid);
-						$('#viewresult').show();
-						$('#upload_success').fadeOut(3000);
-						$('#submitimg').hide();
-					}else{
-						alert("Oops!Some error occurred");
-					}
-							
-			}
+				obj=JSON.parse(jsondata)
+				if(obj.status=='200'){
+					$('.imgresponse').html('<img class="card-img-top" id="resimg" src="data:image/jpeg;base64,' + obj.prediction + '" />');
+					$('.card-title').text(obj.msg);
+					$('#resimg').show();
+					$('.card').fadeIn(2000);
+					$('#resetbutton').show();
+                }else{
+					alert('Some Error Occurred!');
+					$('#submitimg').show();
+				}
             },
         });
 	
 	});
 	});
 	
-	Pace.track(function () {
-	$('#viewresult').click(function(){
-		
-		$('#upload_success').hide();
-		$('#resimg').hide();
-		key=$('#uid').val();
-		
-        $.ajax({
-            type: 'POST',
-            url: '/result',
-            data: {'key':key},
-			dataType: "json",        
-           
-            success: function(jsondata) {
-				
-                if( jsondata != null){
-					obj=jsondata
-					status=obj.status;
-					
-					if(status=='200'){
-						uid=obj.uid;
-						result=obj.result
-						msg=obj.msg
-						$('#uid').val(uid);
-						$('#response').val(result);
-						src="/predictions/"+result
-						
-						$('#resimg').attr("src",src);
-						$('.card-title').text(msg);
-						$('#resimg').show();
-						$('.card').show();
-						$('#viewresult').hide();
-						$('#resetbutton').show();
-					}else{
-						alert("Oops!Some error occurred");
-					}
-							
-			}
-            },
-        });
-	
-	});
-	
-	});
 	
 	
 	$('#resetbutton').click(function(){
@@ -153,18 +99,14 @@ $(document).ready(function(){
 
 </script>
 <style>
-#viewresult{
-width:150px;
-}
+
 #submitimg{
 width:150px;
+display:none;
 }
 #resetbutton{
 width:150px;
-}
-#upload_success{
-margin-top:40px;
-
+display:none;
 }
 
 :root {
@@ -209,13 +151,12 @@ footer p {
 </style>
 
 <body>
-<input type="hidden" id="uid" name="uid" value="">	
-<input type="hidden" id="response" name="response" value="">	
-<main role="main">
+
+<main role="main" class='cover'>
 
       <section class="jumbotron text-center">
         <div class="container">
-          <h1 class="jumbotron-heading">Image Manipulation Detector</h1>
+          <h1 class="jumbotron-heading">Image Forgery Detector</h1>
           <p class="lead text-muted">Tool for detecting Copy-move and Copy-paste forgery</p>
           <p>
 		  
@@ -228,20 +169,15 @@ footer p {
             </div>
 		</p>
 		<p>
-            <button type="button" id='submitimg' class="btn btn-sm btn-primary" id="js-upload-submit">Upload Image</button>
-			  <button type="button" class="btn btn-sm btn-success" id='viewresult'> View Result</button>
+            <button type="button" id='submitimg' class="btn btn-sm btn-primary" id="js-upload-submit">Upload</button>
+			  
 			
           </p>
-		  <p>
-		  
-		  <div class="alert alert-success" role="alert" id='upload_success'>
-				Upload Successful!
-			</div>
-			
-			</p>
-			<p>
+		<p>
 			<div class="card" style="width:300px;margin:auto">
-			  <img class="card-img-top" id='resimg' src="">
+			  <div class='imgresponse'></div>
+			  
+			  
 			  <div class="card-body">
 				<h4 class="card-title"></h4>
 				
