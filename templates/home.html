@@ -20,13 +20,8 @@
 <script src="{{url_for('static', filename='jquery-ui.js')}}"></script>
 <script src="{{url_for('static', filename='popper.js')}}"></script>
 <script src="{{url_for('static', filename='bootstrap.js')}}"></script>
-<script src="{{url_for('static', filename='select2.js')}}"></script>
-<script data-pace-options='{"startOnPageLoad": false }' src="{{url_for('static', filename='pace.js')}}"></script>
-<link rel="stylesheet" href="{{url_for('static', filename='pace2.css')}}">
+
 <script>
-
-
-$(document).ajaxStart(function() { Pace.restart(); });
 
 $(document).ready(function(){
 
@@ -59,9 +54,10 @@ $(document).ready(function(){
 		}
 	});
 
-	Pace.track(function () {
+	
 	$('#submitimg').click(function(){
 		$(this).hide()
+		$('body').append('<div class="overlay"><div class="message"></div></div>');
 		var file = $("#js-upload-files")[0].files[0];        
 		var form_data = new FormData();
 		form_data.set("file", file);
@@ -78,8 +74,9 @@ $(document).ready(function(){
 					$('.imgresponse').html('<img class="card-img-top" id="resimg" src="data:image/jpeg;base64,' + obj.prediction + '" />');
 					$('.card-title').text(obj.msg);
 					$('#resimg').show();
-					$('.card').fadeIn(2000);
+					$('.card').show();
 					$('#resetbutton').show();
+					$('.overlay').hide();
                 }else{
 					alert('Some Error Occurred!');
 					$('#submitimg').show();
@@ -88,7 +85,7 @@ $(document).ready(function(){
         });
 	
 	});
-	});
+	
 	
 	
 	
@@ -99,7 +96,20 @@ $(document).ready(function(){
 
 </script>
 <style>
+.overlay { 
+background:#000;
+position:fixed;
+left:0;
+top:0;
+width:100%;
+height:100%;
+z-index:998;
+opacity: 0.7;
+filter: alpha(opacity=70);
+ }
 
+.message{ background-image: url("{{url_for('static', filename='load.gif')}}"); position:fixed; left:50%; top:50%; width:130px; height:130px; z-index:999; margin-left: -50px;margin-top: -50px;text-align: center;padding-top: 50px; }
+ 
 #submitimg{
 width:150px;
 display:none;
