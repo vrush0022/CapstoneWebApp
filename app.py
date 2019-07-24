@@ -38,6 +38,7 @@ def default():
 @app.route("/upload",methods=["POST"])
 def upload():
     try:
+        print('in upload')
         file = request.files['file'].read()
         uploadedimage=Image.open(BytesIO(file))
         
@@ -105,6 +106,7 @@ def checkForForgerySoftware(softwarename):
 	
 	
 def reverseImageSearch(img):
+    print('reverseImageSearch')
     fetchUrl=None
     try:
         searchUrl = 'http://www.google.hr/searchbyimage/upload'
@@ -117,6 +119,7 @@ def reverseImageSearch(img):
     return fetchUrl
 
 def scrapeGoogleResults(fetchUrl,maxResults=3):
+    print('scrapeGoogleResults')
     toReturn=[]
     if fetchUrl==None or fetchUrl=='':
         return toReturn
