@@ -30,6 +30,7 @@ $(document).ready(function(){
 	//$('#resetbutton').hide();
 	$('#resimg').hide();
 	$('.card').hide();
+	$('#moreinfobtn').hide();
 
 	$(".custom-file-input").on("change", function() {
 		$('#resetbutton').hide();
@@ -37,7 +38,7 @@ $(document).ready(function(){
 		$('#resetbutton').hide();
 		$('#resimg').hide();
 		$('.card').hide();
-		
+		$('#moreinfobtn').hide();
 		var fileName = $(this).val().split("\\").pop();
 		if (fileName.toUpperCase().endsWith('JPG') || fileName.toUpperCase().endsWith('JPEG') || fileName.toUpperCase().endsWith('PNG')){
 			if(fileName==''){
@@ -57,10 +58,11 @@ $(document).ready(function(){
 	
 	$('#submitimg').click(function(){
 		$(this).hide()
-		$('body').append('<div class="overlay"><div class="message"></div></div>');
+		$('body').append('<div class="overlaybg"><div class="message"></div></div>');
 		var file = $("#js-upload-files")[0].files[0];        
 		var form_data = new FormData();
 		form_data.set("file", file);
+		$('.modal-body').html('');
         $.ajax({
             type: 'POST',
             url: '/upload',
@@ -76,10 +78,24 @@ $(document).ready(function(){
 					$('#resimg').show();
 					$('.card').show();
 					$('#resetbutton').show();
-					$('.overlay').hide();
+					$('.overlaybg').hide();
+					//parsing the scraped data
+					scraped_data=obj.content;
+					console.log(scraped_data.length);
+					if(scraped_data.length>0){
+						$('#moreinfobtn').show();
+						$.each(scraped_data, function(property, value) {						
+							$('.modal-body').append('<div class="s"><div class="q"><img src="'+value.smallimg+'"></div><div style="margin-left: 70px;"><a target="_blank" style="text-decoration: none;" href="'+value.link+'" url="'+value.link+'"><h3 class="LC20lb">'+value.shortDesc+'</h3><div><cite class="desc">'+value.link+'</cite></div></a></div></div><br>');
+						});
+					}else{
+					
+						$('#moreinfobtn').hide();
+					}
                 }else{
 					alert('Some Error Occurred!');
 					$('#submitimg').show();
+					$('.overlaybg').hide();
+					$('#moreinfobtn').hide();
 				}
             },
         });
@@ -96,7 +112,25 @@ $(document).ready(function(){
 
 </script>
 <style>
-.overlay { 
+
+.custom-file{
+width:85%
+
+}
+.modal-header{
+margin-top:100px;
+
+}
+.q{
+background-color: #fff;
+    float: left;
+    overflow: hidden;
+    margin-top: 4px;
+    position: relative;
+	height: 34px;
+    width: 61px;
+}
+.overlaybg { 
 background:#000;
 position:fixed;
 left:0;
@@ -108,6 +142,33 @@ opacity: 0.7;
 filter: alpha(opacity=70);
  }
 
+ .s{
+ line-height: 1.54;
+ }
+.modal-backdrop.fade{
+opacity:0.8;
+} 
+#info-modal{
+opacity:1;
+top:60px;
+
+}
+.modal-body{
+min-height:300px;
+overflow-y:scroll;
+} 
+
+.LC20lb{
+    font-size: 12px;
+    line-height: 1.33;	
+	text-overflow: ellipsis;
+}
+.desc{
+font-size: 12px;
+word-break: break-word;
+color:#808080;
+}
+
 .message{ background-image: url("{{url_for('static', filename='358.gif')}}"); position:fixed; left:50%; top:50%; width:130px; height:130px; z-index:999; margin-left: -50px;margin-top: -50px;text-align: center;padding-top: 50px; }
  
 #submitimg{
@@ -115,8 +176,10 @@ width:150px;
 display:none;
 }
 #resetbutton{
-width:150px;
+width:56px;
 display:none;
+height:calc(2.25rem + 2px);
+margin-left:10px;
 }
 
 :root {
@@ -175,8 +238,10 @@ footer p {
               <div class="form-group">
                 <input type="file" name="file" id="js-upload-files" class="custom-file-input">
 				<label class="custom-file-label" for="customFile">Choose File</label>
+				
               </div>              
             </div>
+			<button type="button" id='resetbutton' class="btn btn-sm btn-danger" >Reset</button>  
 		</p>
 		<p>
             <button type="button" id='submitimg' class="btn btn-sm btn-primary" id="js-upload-submit">Upload</button>
@@ -184,19 +249,20 @@ footer p {
 			
           </p>
 		<p>
-			<div class="card" style="width:300px;margin:auto">
+			<div class="card" style="width:300px;margin:auto;">
 			  <div class='imgresponse'></div>
 			  
 			  
 			  <div class="card-body">
 				<h4 class="card-title"></h4>
+				<button type="button" class="btn btn-primary" id='moreinfobtn' data-toggle="modal" data-target='#info-modal'>View Details</button>
 				
+			
 			  </div>
 			</div>
 						
 			</p>
 			<p>
-			<button type="button" id='resetbutton' class="btn btn-sm btn-default" >Reset</button>  
 			</p>
 		</div>
 		
@@ -204,7 +270,26 @@ footer p {
 	</main>  
 	  
         
-          
+        <div id="info-modal" class="modal fade" role="dialog">
+		  <div class="modal-dialog">    
+			<div class="modal-content">
+			  <div class="modal-header">
+			  <h4 class="modal-title" style="color:#808080;">Pages that include matching images</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				
+			  </div>
+			  <div class="modal-body">
+			  
+				
+			  </div>
+			  <div class="modal-footer">
+				
+			  </div>
+			</div>
+
+		  </div>
+		</div>
+  
 
 
 </body>
