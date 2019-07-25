@@ -26,8 +26,6 @@
 $(document).ready(function(){
 
 	//init
-	//$('#submitimg').hide();
-	//$('#resetbutton').hide();
 	$('#resimg').hide();
 	$('.card').hide();
 	$('#moreinfobtn').hide();
@@ -87,10 +85,16 @@ $(document).ready(function(){
 						$.each(scraped_data, function(property, value) {						
 							$('.modal-body').append('<div class="s"><div class="q"><img src="'+value.smallimg+'"></div><div style="margin-left: 70px;"><a target="_blank" style="text-decoration: none;" href="'+value.link+'" url="'+value.link+'"><h3 class="LC20lb">'+value.shortDesc+'</h3><div><cite class="desc">'+value.link+'</cite></div></a></div></div><br>');
 						});
+
 					}else{
 					
 						$('#moreinfobtn').hide();
 					}
+					
+					$('html, body').animate({
+									scrollTop: $(".card").offset().top
+								}, 1000);
+					setTimeout(function(){ $('html, body').stop(); }, 1000);
                 }else{
 					alert('Some Error Occurred!');
 					$('#submitimg').show();
@@ -114,7 +118,7 @@ $(document).ready(function(){
 <style>
 
 .custom-file{
-width:85%
+width:100%
 
 }
 .modal-header{
@@ -138,7 +142,7 @@ top:0;
 width:100%;
 height:100%;
 z-index:998;
-opacity: 0.7;
+opacity: 0.9;
 filter: alpha(opacity=70);
  }
 
@@ -146,7 +150,7 @@ filter: alpha(opacity=70);
  line-height: 1.54;
  }
 .modal-backdrop.fade{
-opacity:0.8;
+opacity:0.9;
 } 
 #info-modal{
 opacity:1;
@@ -176,10 +180,8 @@ width:150px;
 display:none;
 }
 #resetbutton{
-width:56px;
 display:none;
 height:calc(2.25rem + 2px);
-margin-left:10px;
 }
 
 :root {
@@ -190,7 +192,7 @@ margin-left:10px;
   padding-top: var(--jumbotron-padding-y);
   padding-bottom: var(--jumbotron-padding-y);
   margin-bottom: 0;
-  background-color: #fff;
+  background-color: #1f2833;
 }
 @media (min-width: 768px) {
   .jumbotron {
@@ -205,10 +207,22 @@ margin-left:10px;
 
 .jumbotron-heading {
   font-weight: 300;
+  color: #66fcf1;
+    font-size: 58px;
+    font-family: fantasy;
+    text-shadow: 0 2px 2px #2a3d56;
 }
+.heading2{
+ color: #45a29e;
+    font-size: 18px;
+    
+
+}
+
 
 .jumbotron .container {
   max-width: 40rem;
+  min-height:500px;
 }
 
 footer {
@@ -221,6 +235,10 @@ footer p {
 }
 
 .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+
+body{
+background-color: #1f2833;
+}
 </style>
 
 <body>
@@ -228,20 +246,22 @@ footer p {
 <main role="main" class='cover'>
 
       <section class="jumbotron text-center">
-        <div class="container">
+        <div class="container" >
           <h1 class="jumbotron-heading">Image Forgery Detector</h1>
-          <p class="lead text-muted">Tool for detecting Copy-move and Copy-paste forgery</p>
+          <p><h3 class="heading2">Tool for detecting Copy-move and Copy-paste forgery</h1>
+		  <p class="lead" style="margin-top:100px;color:#c5c6c7;font-size: 1.25rem;font-weight: 300;">Search by image and find out if its forged!</p>		  
           <p>
 		  
 	
             <div class="custom-file">
               <div class="form-group">
-                <input type="file" name="file" id="js-upload-files" class="custom-file-input">
-				<label class="custom-file-label" for="customFile">Choose File</label>
+                
+				<input type="file" name="file" id="js-upload-files" class="custom-file-input">
+				<label class="custom-file-label" for="customFile">Choose Image</label>
 				
               </div>              
             </div>
-			<button type="button" id='resetbutton' class="btn btn-sm btn-danger" >Reset</button>  
+			 
 		</p>
 		<p>
             <button type="button" id='submitimg' class="btn btn-sm btn-primary" id="js-upload-submit">Upload</button>
@@ -249,11 +269,13 @@ footer p {
 			
           </p>
 		<p>
-			<div class="card" style="width:300px;margin:auto;">
+			<div class="card" style="width:300px;margin:auto;border:0;box-shadow: 0px 0px 15px 0px #66fcf1;top:60px;margin-bottom:100px;">
+			 <span id ="resetbutton" class="pull-right clickable close-icon" data-effect="fadeOut" style="position:absolute;right:5px;color:#fff;cursor:pointer"><i class="fa fa-times"></i></span>
+ 
 			  <div class='imgresponse'></div>
 			  
 			  
-			  <div class="card-body">
+			  <div class="card-body" style="background-color: #1f2833;color: #e3e2df;">
 				<h4 class="card-title"></h4>
 				<button type="button" class="btn btn-primary" id='moreinfobtn' data-toggle="modal" data-target='#info-modal'>View Details</button>
 				
@@ -289,7 +311,11 @@ footer p {
 
 		  </div>
 		</div>
-  
+   <footer class="footer" style="padding-top: 5px;padding-bottom: 5px; text-align:center;position:relative;bottom:10px;width:100%;">
+      <div class="container">
+        <span class="text-muted">We would love to hear from you! Please write to us for any feedback.<br/>Vrushank Gude(vrush0022@gmail.com)<br/>Ayush Kumar Singh(ayushkumar578@gmail.com)</span>
+      </div>
+    </footer>
 
 
 </body>
