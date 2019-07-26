@@ -125,7 +125,8 @@ def scrapeGoogleResults(fetchUrl,maxResults=3):
     if fetchUrl==None or fetchUrl=='':
         return toReturn
     try:
-        print('scraping data')      
+        print('scraping data')
+        print('URL:',fetchUrl)
         headers = requests.utils.default_headers()
         headers.update({
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
