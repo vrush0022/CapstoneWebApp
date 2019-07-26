@@ -107,8 +107,7 @@ def checkForForgerySoftware(softwarename):
     return any(softwarename.upper().find(sw)!=-1 for sw in softwares)
 	
 	
-def reverseImageSearch(img):
-    
+def reverseImageSearch(img):    
     fetchUrl=None
     try:
         searchUrl = 'http://www.google.hr/searchbyimage/upload'
@@ -121,20 +120,17 @@ def reverseImageSearch(img):
     return fetchUrl
 
 def scrapeGoogleResults(fetchUrl,maxResults=3):
-    print('scrapeGoogleResults')
-    print(fetchUrl)
+      
     toReturn=[]
     if fetchUrl==None or fetchUrl=='':
         return toReturn
     try:
-        
+        print('scraping data')      
         headers = requests.utils.default_headers()
         headers.update({
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
         })
-        res=requests.get(fetchUrl,headers=headers)
-        print('result')
-        print(res.text)
+        res=requests.get(fetchUrl,headers=headers)        
         soup=BeautifulSoup(res.text,'html.parser')
         if soup!=None:        
             div=soup.find_all('div',attrs={'class':'srg'})        
