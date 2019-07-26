@@ -60,6 +60,8 @@ def upload():
                 msg='Image Classified as Fake'
                 googleurl=reverseImageSearch(file)
                 content=scrapeGoogleResults(googleurl)
+                if len(content)>0:
+                    print('Scraping Data Exist')
             else:
                 msg='Image Classified as Pristine'
                 content=[]
@@ -138,7 +140,7 @@ def scrapeGoogleResults(fetchUrl,maxResults=3):
                 results=div[divtofetch].find_all('div',attrs={'class':'g'})
                 count=1
                 for result in results:
-                    if count>3:
+                    if count>maxResults:
                         break
                     obj={}
                     text=result.find_all('div',attrs={'class':'r'})
