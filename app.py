@@ -108,7 +108,7 @@ def checkForForgerySoftware(softwarename):
 	
 	
 def reverseImageSearch(img):
-    print('reverseImageSearch')
+    
     fetchUrl=None
     try:
         searchUrl = 'http://www.google.hr/searchbyimage/upload'
