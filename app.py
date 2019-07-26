@@ -122,6 +122,7 @@ def reverseImageSearch(img):
 
 def scrapeGoogleResults(fetchUrl,maxResults=3):
     print('scrapeGoogleResults')
+    print(fetchUrl)
     toReturn=[]
     if fetchUrl==None or fetchUrl=='':
         return toReturn
@@ -132,6 +133,8 @@ def scrapeGoogleResults(fetchUrl,maxResults=3):
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
         })
         res=requests.get(fetchUrl,headers=headers)
+        print('result')
+        print(res.text)
         soup=BeautifulSoup(res.text,'html.parser')
         if soup!=None:        
             div=soup.find_all('div',attrs={'class':'srg'})        
