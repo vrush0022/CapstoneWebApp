@@ -48,7 +48,7 @@ def upload():
             scaledimage=np.array(uploadedimage)/255.
             pred=predict(scaledimage)
             if(np.count_nonzero(pred.flatten())>100):#atleast 100 pixels should be classified as fake
-                
+                content=[]
                 indices = np.where(pred[0,:,:,0] == 1)
                 upper = np.min(indices[0])
                 lower = np.max(indices[0])
@@ -58,10 +58,13 @@ def upload():
                 draw = ImageDraw.Draw(uploadedimage)
                 draw.rectangle([(left,upper),(right,lower)],outline=(0,255,0),width=3)
                 msg='Image Classified as Fake'
-                googleurl=reverseImageSearch(file)
-                content=scrapeGoogleResults(googleurl)
-                if len(content)>0:
-                    print('Scraping Data Exist')
+                hostname=request.host                
+                if hostname.find('heroku')==-1:
+                    #Scrape only in local system. Not on heroku
+                    googleurl=reverseImageSearch(file)
+                    content=scrapeGoogleResults(googleurl)
+                    if len(content)>0:
+                        print('Scraping Data Exist')
             else:
                 msg='Image Classified as Pristine'
                 content=[]
