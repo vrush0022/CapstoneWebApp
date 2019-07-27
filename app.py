@@ -133,6 +133,7 @@ def scrapeGoogleResults(fetchUrl,maxResults=3):
         })
         res=requests.get(fetchUrl,headers=headers)        
         soup=BeautifulSoup(res.text,'html.parser')
+        print(res.text)
         if soup!=None:        
             div=soup.find_all('div',attrs={'class':'srg'})        
             if div!=None and len(div)>0:
