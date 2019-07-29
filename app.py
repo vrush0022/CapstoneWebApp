@@ -35,6 +35,40 @@ model.load_weights("model/model3.h5")
 def default():
     return render_template('home.html')
 
+
+'''
+Primary Flow:
+1. User Uploads the image from UI
+2. Image is read in the Backend
+3. The exif data of uploaded image is checked using below logic:
+	3.1 If exif data exist
+		3.1.1 If 'software' property of exif data is None or value of 'software' property not in ['PHOTOSHOP','GIMP','PAINT'] goto Alternate Flow 1(AF1)
+		
+		3.1.2 Else goto step 4 
+				
+	3.2 Exif Data doesnt exist, goto step 4
+	
+4. Resize Image to 256X256
+5. Divide pixels by 255.
+6. Predict using the model
+7. Count Non-zero pixels
+	7.1 Count>100 goto step 8.
+		
+	7.2 Image Classified as Pristine goto step 12.
+
+8. Image Classified as Fake
+9. Execute Reverse Image Search
+10. Compute co-ordinates of bounding box
+11. Draw Bounding Box on Image	
+12. Return Image bytes to UI
+
+	
+Alternate Flow 1(AF1)
+1. Resize Image
+2. Image Classified as Pristine
+3. Return Image bytes to UI
+
+'''
 @app.route("/upload",methods=["POST"])
 def upload():
     try:
@@ -49,12 +83,14 @@ def upload():
             pred=predict(scaledimage)
             if(np.count_nonzero(pred.flatten())>100):#atleast 100 pixels should be classified as fake
                 content=[]
+                #Compute the co-ordinates of the bounding box
                 indices = np.where(pred[0,:,:,0] == 1)
                 upper = np.min(indices[0])
                 lower = np.max(indices[0])
                 left = np.min(indices[1])
                 right = np.max(indices[1])
                 
+                #Draw rectange localizing the forgery
                 draw = ImageDraw.Draw(uploadedimage)
                 draw.rectangle([(left,upper),(right,lower)],outline=(0,255,0),width=3)
                 msg='Image Classified as Fake'
@@ -82,6 +118,7 @@ def upload():
     
 
 def predict(img):
+    #Use the loaded model to predict
     global sess
     global graph
     with graph.as_default():
@@ -93,6 +130,7 @@ def predict(img):
 
 
 def checkExifData(img):
+    #Exif Data only exist for JPEG.
     toReturn=False
     if img.format=='JPEG':
         exifDataRaw = img._getexif()
@@ -123,8 +161,9 @@ def reverseImageSearch(img):
     return fetchUrl
 
 def scrapeGoogleResults(fetchUrl,maxResults=3):
-      
+    #Scrape top 3 results from google 
     toReturn=[]
+    #If fetchUrl is None it means that the image is unique and no info exist on google
     if fetchUrl==None or fetchUrl=='':
         return toReturn
     try:
